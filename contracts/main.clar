@@ -99,3 +99,13 @@
            (default-to u0 (map-get? user-points b)))
         a
         b))
+
+;; Getters
+(define-read-only (get-team (user principal))
+    (default-to (list) (map-get? teams user)))
+
+(define-read-only (get-user-points (user principal))
+    (default-to u0 (map-get? user-points user)))
+
+(define-read-only (get-prize-pool)
+    (var-get total-prize-pool))
