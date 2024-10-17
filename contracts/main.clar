@@ -29,3 +29,16 @@
 (define-map user-entry-paid
     principal
     bool)
+
+;; Administrative Functions
+(define-public (set-season-status (new-status bool))
+    (begin
+        (asserts! (is-eq tx-sender contract-owner) ERR-NOT-AUTHORIZED)
+        (var-set season-status new-status)
+        (ok true)))
+
+(define-public (set-entry-fee (new-fee uint))
+    (begin
+        (asserts! (is-eq tx-sender contract-owner) ERR-NOT-AUTHORIZED)
+        (var-set entry-fee new-fee)
+        (ok true)))
