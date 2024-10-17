@@ -42,3 +42,16 @@
         (asserts! (is-eq tx-sender contract-owner) ERR-NOT-AUTHORIZED)
         (var-set entry-fee new-fee)
         (ok true)))
+
+;; Team Management Functions
+(define-public (join-league)
+    (let ((current-balance (stx-get-balance tx-sender)))
+        (asserts! (var-get season-status) ERR-SEASON-ENDED)
+        (asserts! (>= current-balance (var-get entry-fee)) ERR-INSUFFICIENT-BALANCE)
+        (asserts! (not (default-to false (map-get? user-entry-paid tx-sender))) ERR-TEAM-FULL)
+        (begin
+            (try! (stx-transfer? (var-get entry-fee) tx-sender (as-contract tx-sender)))
+            (var-set total-prize-pool (+ (var-get total-prize-pool) (var-get entry-fee)))
+            (map-set user-entry-paid tx-sender true)
+            (ok true))))
+
