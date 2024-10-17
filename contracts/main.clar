@@ -80,3 +80,22 @@
 
 (define-read-only (get-player-score (player-id uint))
     (default-to u0 (map-get? player-scores player-id)))
+
+;; Reward Distribution
+(define-public (distribute-rewards)
+    (let ((winner (get-highest-scorer)))
+        (begin
+            (asserts! (not (var-get season-status)) ERR-SEASON-NOT-ENDED)
+            (try! (as-contract (stx-transfer? (var-get total-prize-pool) tx-sender winner)))
+            (var-set total-prize-pool u0)
+            (ok true))))
+
+(define-read-only (get-highest-scorer)
+    (let ((participants (map-keys user-points)))
+        (fold get-higher-scorer participants (element-at participants u0))))
+
+(define-private (get-higher-scorer (a principal) (b principal))
+    (if (> (default-to u0 (map-get? user-points a))
+           (default-to u0 (map-get? user-points b)))
+        a
+        b))
