@@ -55,3 +55,28 @@
             (map-set user-entry-paid tx-sender true)
             (ok true))))
 
+(define-public (draft-player (player-id uint))
+    (let ((current-team (default-to (list) (map-get? teams tx-sender))))
+        (asserts! (var-get season-status) ERR-SEASON-ENDED)
+        (asserts! (default-to false (map-get? user-entry-paid tx-sender)) ERR-NOT-AUTHORIZED)
+        (asserts! (< (len current-team) u10) ERR-TEAM-FULL)
+        (begin
+            (map-set teams tx-sender (append current-team player-id))
+            (ok true))))
+
+;; Scoring and Oracle Functions
+(define-public (update-player-score (player-id uint) (new-score uint))
+    (begin
+        (asserts! (is-eq tx-sender contract-owner) ERR-NOT-AUTHORIZED)
+        (map-set player-scores player-id new-score)
+        (ok true)))
+
+(define-public (calculate-team-points (user principal))
+    (let ((team (default-to (list) (map-get? teams user)))
+          (total-points (fold + (map get-player-score team) u0)))
+        (begin
+            (map-set user-points user total-points)
+            (ok total-points))))
+
+(define-read-only (get-player-score (player-id uint))
+    (default-to u0 (map-get? player-scores player-id)))
