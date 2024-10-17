@@ -13,3 +13,19 @@
 (define-data-var entry-fee uint u100000000) ;; 100 STX
 (define-data-var total-prize-pool uint u0)
 
+;; Data Maps
+(define-map teams
+    principal
+    (list 10 uint))  ;; List of player IDs
+
+(define-map player-scores
+    uint  ;; player ID
+    uint) ;; current score
+
+(define-map user-points
+    principal
+    uint)
+
+(define-map user-entry-paid
+    principal
+    bool)
